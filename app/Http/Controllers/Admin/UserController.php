@@ -4,60 +4,48 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Http\Controllers\EnvController;
 use App\Models\Role;
+use App\Models\User;
 
 class UserController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
     /**
-     * Récupération des utilisteurs pour l'interface administrateur.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Retourne la liste paginée des utilisateurs.
      */
-    public function getusers(Request $request)
+    public function index(Request $request)
     {
         $data = json_decode($request->lazyEvent);
 
         $users = User::with('role');
-        $count = User::whereRaw("1 = 1");
+        $count = User::whereRaw('1 = 1');
 
         $env = new EnvController();
-        $count = $env->QueryBuilder($count,$data,true);
-        $users = $env->QueryBuilder($users,$data);
-        
-        
-        return json_encode(array('payload' => $users->get(), 'count' => $count));
+        $count = $env->QueryBuilder($count, $data, true);
+        $users = $env->QueryBuilder($users, $data);
+
+        return json_encode(['payload' => $users->get(), 'count' => $count]);
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Retourne la liste des rôles pour les selects.
      */
-    public function getroles(Request $request)
+    public function getRoles(Request $request)
     {
         $roles = Role::all();
-        
-        return json_encode(array('roles' => $roles));
+
+        return json_encode(['roles' => $roles]);
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Crée un nouvel utilisateur.
      */
-    public function createuser(Request $request)
+    public function store(Request $request)
     {
         $data = json_decode($request->user);
 
@@ -66,65 +54,56 @@ class UserController extends Controller
         $user->nom = $data->nom;
         $user->prenom = $data->prenom;
         $user->email = $data->email;
-        $user->roles_id = $data->role->id;
+        $user->role_id = $data->role->id;
         $user->password = \Hash::make($data->password);
 
         $user->save();
 
-        
         return json_encode(true);
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Met à jour un utilisateur existant.
      */
-    public function updateuser(Request $request)
+    public function update(Request $request, $id)
     {
         $data = json_decode($request->user);
 
-        $user = User::findOrFail($data->id);
+        $user = User::findOrFail($id);
         $user->username = $data->username;
         $user->nom = $data->nom;
         $user->prenom = $data->prenom;
         $user->email = $data->email;
-        $user->roles_id = $data->role->id;
+        $user->role_id = $data->role->id;
 
         $user->save();
-        
+
         return json_encode(true);
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Met à jour le mot de passe d'un utilisateur.
      */
-    public function updatepassworduser(Request $request)
+    public function updatePassword(Request $request, $id)
     {
         $data = json_decode($request->user);
 
-        $user = User::findOrFail($data->id);
+        $user = User::findOrFail($id);
         $user->password = \Hash::make($data->password);
 
         $user->save();
-        
+
         return json_encode(true);
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Supprime un utilisateur.
      */
-    public function deleteuser(Request $request)
+    public function destroy($id)
     {
-        $data = json_decode($request->user);
-
-        $user = User::findOrFail($data->id);
+        $user = User::findOrFail($id);
         $user->delete();
-        
+
         return json_encode(true);
     }
 }

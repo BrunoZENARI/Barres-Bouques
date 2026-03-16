@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\BookController;
+use App\Http\Controllers\LoanController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -10,45 +12,62 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     $info = $request->user();
-    
+
     $stack = json_decode($info, true);
-    $stack["role"] = json_decode($request->user()->role, true);
-    $stack["role"]["permissions"] = json_decode($request->user()->role->permissions, true);
+    $stack['role'] = json_decode($request->user()->role, true);
+    $stack['role']['permissions'] = json_decode($request->user()->role->permissions, true);
+
     return json_encode($stack);
 });
 
+Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum', 'permission:can_use_admin']], function () {
 
-Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum','permission:can_use_admin']], function () {
-    Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum','permission:can_use_admin_users_page']], function () {
-        Route::middleware('permission:can_see_admin_users')->post('/getusers', [UserController::class, 'getusers']);
-        Route::middleware('permission:can_see_admin_users')->get('/getroles', [UserController::class, 'getroles']);
-        Route::middleware('permission:can_create_admin_users')->post('/createuser', [UserController::class, 'createuser']);
-        Route::middleware('permission:can_update_admin_users')->post('/updateuser', [UserController::class, 'updateuser']);
-        Route::middleware('permission:can_update_admin_users')->post('/updatepassworduser', [UserController::class, 'updatepassworduser']);
-        Route::middleware('permission:can_delete_admin_users')->post('/deleteuser', [UserController::class, 'deleteuser']);
+    // Gestion des utilisateurs
+    Route::group(['prefix' => 'users', 'middleware' => ['auth:sanctum', 'permission:can_use_admin_users_page']], function () {
+        Route::middleware('permission:can_see_admin_users')->post('/search', [UserController::class, 'index'])->name('admin.users.index');
+        Route::middleware('permission:can_see_admin_users')->get('/roles', [UserController::class, 'getRoles'])->name('admin.users.roles');
+        Route::middleware('permission:can_create_admin_users')->post('/', [UserController::class, 'store'])->name('admin.users.store');
+        Route::middleware('permission:can_update_admin_users')->put('/{id}', [UserController::class, 'update'])->name('admin.users.update');
+        Route::middleware('permission:can_update_admin_users')->patch('/{id}/password', [UserController::class, 'updatePassword'])->name('admin.users.update-password');
+        Route::middleware('permission:can_delete_admin_users')->delete('/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
     });
 
-    Route::group(['prefix' => 'permission', 'middleware' => ['auth:sanctum','permission:can_use_admin_permissions_page']], function () {
-        Route::middleware('permission:can_see_admin_permissions')->post('/getpermissions', [PermissionController::class, 'getpermissions']);
-        Route::middleware('permission:can_create_admin_permissions')->post('/createpermission', [PermissionController::class, 'createpermission']);
-        Route::middleware('permission:can_update_admin_permissions')->post('/updatepermission', [PermissionController::class, 'updatepermission']);
-        Route::middleware('permission:can_delete_admin_permissions')->post('/deletepermission', [PermissionController::class, 'deletepermission']);
+    // Gestion des permissions
+    Route::group(['prefix' => 'permissions', 'middleware' => ['auth:sanctum', 'permission:can_use_admin_permissions_page']], function () {
+        Route::middleware('permission:can_see_admin_permissions')->post('/search', [PermissionController::class, 'index'])->name('admin.permissions.index');
+        Route::middleware('permission:can_create_admin_permissions')->post('/', [PermissionController::class, 'store'])->name('admin.permissions.store');
+        Route::middleware('permission:can_update_admin_permissions')->put('/{id}', [PermissionController::class, 'update'])->name('admin.permissions.update');
+        Route::middleware('permission:can_delete_admin_permissions')->delete('/{id}', [PermissionController::class, 'destroy'])->name('admin.permissions.destroy');
     });
 
-    Route::group(['prefix' => 'role', 'middleware' => ['auth:sanctum','permission:can_use_admin_roles_page']], function () {
-        Route::middleware('permission:can_see_admin_roles')->post('/getroles', [RoleController::class, 'getroles']);
-        Route::middleware('permission:can_see_admin_roles')->get('/getpermissions', [RoleController::class, 'getpermissions']);
-        Route::middleware('permission:can_create_admin_roles')->post('/createrole', [RoleController::class, 'createrole']);
-        Route::middleware('permission:can_update_admin_roles')->post('/updaterole', [RoleController::class, 'updaterole']);
-        Route::middleware('permission:can_delete_admin_roles')->post('/deleterole', [RoleController::class, 'deleterole']);
+    // Gestion des rôles
+    Route::group(['prefix' => 'roles', 'middleware' => ['auth:sanctum', 'permission:can_use_admin_roles_page']], function () {
+        Route::middleware('permission:can_see_admin_roles')->post('/search', [RoleController::class, 'index'])->name('admin.roles.index');
+        Route::middleware('permission:can_see_admin_roles')->get('/permissions', [RoleController::class, 'getPermissions'])->name('admin.roles.permissions');
+        Route::middleware('permission:can_create_admin_roles')->post('/', [RoleController::class, 'store'])->name('admin.roles.store');
+        Route::middleware('permission:can_update_admin_roles')->put('/{id}', [RoleController::class, 'update'])->name('admin.roles.update');
+        Route::middleware('permission:can_delete_admin_roles')->delete('/{id}', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
     });
+});
+
+// Gestion des ouvrages
+Route::group(['prefix' => 'books', 'middleware' => ['auth:sanctum']], function () {
+    Route::post('/search', [BookController::class, 'index'])->name('books.index');
+    Route::get('/{id}', [BookController::class, 'show'])->name('books.show');
+    Route::post('/', [BookController::class, 'store'])->name('books.store');
+    Route::put('/{id}', [BookController::class, 'update'])->name('books.update');
+    Route::delete('/{id}', [BookController::class, 'destroy'])->name('books.destroy');
+});
+
+// Gestion des emprunts
+Route::group(['prefix' => 'loans', 'middleware' => ['auth:sanctum']], function () {
+    Route::post('/search', [LoanController::class, 'index'])->name('loans.index');
+    Route::get('/{id}', [LoanController::class, 'show'])->name('loans.show');
+    Route::post('/', [LoanController::class, 'store'])->name('loans.store');
+    Route::put('/{id}', [LoanController::class, 'update'])->name('loans.update');
+    Route::delete('/{id}', [LoanController::class, 'destroy'])->name('loans.destroy');
 });

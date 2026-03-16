@@ -16,8 +16,8 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('nom');
             $table->string('prenom');
-            $table->string('username');
-            $table->unsignedBigInteger('roles_id')->nullable()->index('roles_id');
+            $table->string('username')->unique();
+            $table->unsignedBigInteger('role_id')->nullable()->index();
             $table->boolean('is_active')->default(false);
             $table->string('email')->nullable();
             $table->timestamp('email_verified_at')->nullable();

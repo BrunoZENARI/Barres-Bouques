@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('permissions', function (Blueprint $table) {
-            $table->comment('table contenant les différentes permission ');
+            $table->comment('table contenant les différentes permissions');
             $table->bigIncrements('id');
-            $table->string('p_slug');
-            $table->string('p_libelle');
-            $table->string('p_categorie');
+            $table->string('slug')->unique();
+            $table->string('name');
+            $table->string('category');
             $table->timestamps();
         });
     }

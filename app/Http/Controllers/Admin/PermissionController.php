@@ -9,90 +9,70 @@ use App\Models\Permission;
 
 class PermissionController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
     /**
-     * Récupération des utilisteurs pour l'interface administrateur.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Retourne la liste paginée des permissions.
      */
-    public function getpermissions(Request $request)
+    public function index(Request $request)
     {
         $data = json_decode($request->lazyEvent);
 
-        $permissions = Permission::whereRaw("1 = 1");
-        $count = Permission::whereRaw("1 = 1");
+        $permissions = Permission::whereRaw('1 = 1');
+        $count = Permission::whereRaw('1 = 1');
 
         $env = new EnvController();
-        $count = $env->QueryBuilder($count,$data,true);
-        $permissions = $env->QueryBuilder($permissions,$data);
-        
-        
-        return json_encode(array('payload' => $permissions->get(), 'count' => $count));
+        $count = $env->QueryBuilder($count, $data, true);
+        $permissions = $env->QueryBuilder($permissions, $data);
+
+        return json_encode(['payload' => $permissions->get(), 'count' => $count]);
     }
 
-    
-
-
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Crée une nouvelle permission.
      */
-    public function createpermission(Request $request)
+    public function store(Request $request)
     {
         $data = json_decode($request->permission);
 
         $permission = new Permission();
-        $permission->p_slug = $data->p_slug;
-        $permission->p_libelle = $data->p_libelle;
-        $permission->p_categorie = $data->p_categorie;
+        $permission->slug = $data->slug;
+        $permission->name = $data->name;
+        $permission->category = $data->category;
 
         $permission->save();
 
-        
         return json_encode(true);
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Met à jour une permission existante.
      */
-    public function updatepermission(Request $request)
+    public function update(Request $request, $id)
     {
         $data = json_decode($request->permission);
 
-        $permission = Permission::findOrFail($data->id);
-        $permission->p_slug = $data->p_slug;
-        $permission->p_libelle = $data->p_libelle;
-        $permission->p_categorie = $data->p_categorie;
+        $permission = Permission::findOrFail($id);
+        $permission->slug = $data->slug;
+        $permission->name = $data->name;
+        $permission->category = $data->category;
 
         $permission->save();
-        
+
         return json_encode(true);
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Supprime une permission.
      */
-    public function deletepermission(Request $request)
+    public function destroy($id)
     {
-        $data = json_decode($request->permission);
-
-        $permission = Permission::findOrFail($data->id);
+        $permission = Permission::findOrFail($id);
         $permission->delete();
-        
+
         return json_encode(true);
     }
 }
