@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('roles', function (Blueprint $table) {
-            $table->comment('table contenant la liste des différents roles ');
+            $table->comment('table contenant la liste des différents rôles');
             $table->bigIncrements('id');
-            $table->string('r_slug');
-            $table->string('r_libelle');
+            $table->string('slug')->unique();
+            $table->string('name');
             $table->timestamps();
         });
     }

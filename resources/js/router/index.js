@@ -1,115 +1,127 @@
-import {createWebHistory, createRouter} from "vue-router";
-
-import axios from 'axios';
-
-import { useAuthStore } from '@/store/auth'
+import { createWebHistory, createRouter } from 'vue-router';
+import { useAuthStore } from '@/store/auth';
 
 /* Guest Component */
-import Login from '../components/auth/Login.vue';
-/* Guest Component */
+import Login from '../components/auth/login.vue';
 
-/* Layouts */
-import Layout from '../components/layouts/Layout.vue';
-/* Layouts */
+/* Layout */
+import Layout from '../components/layouts/layout.vue';
 
-/* *********** Authenticated Component *********** */
-import Home from '../components/home/Home.vue';
-import Users from '../components/administration/Users.vue';
-import Permissions from '../components/administration/Permissions.vue';
-import Roles from '../components/administration/Roles.vue';
-/* *********** Authenticated Component *********** */
-
+/* Authenticated Components */
+import Home from '../components/home/home.vue';
+import Users from '../components/administration/users.vue';
+import Permissions from '../components/administration/permissions.vue';
+import Roles from '../components/administration/roles.vue';
+import BookList from '../components/books/book-list.vue';
+import LoanList from '../components/loans/loan-list.vue';
 
 export const routes = [
     {
-        name:"login",
-        path:"/login",
-        component:Login,
-        meta:{
-            middleware:"guest",
-            title:`Login`
-        }
+        name: 'login',
+        path: '/login',
+        component: Login,
+        meta: {
+            middleware: 'guest',
+            title: 'Connexion',
+        },
     },
     {
-        path:"/",
-        component:Layout,
-        meta:{
-            middleware:"auth"
+        path: '/',
+        component: Layout,
+        meta: {
+            middleware: 'auth',
         },
-        children:[
+        children: [
             {
-                name:"home",
+                name: 'home',
                 path: '/home',
                 component: Home,
-                meta:{
-                    title:`Accueil`,
-                    permissions : 'can_see_home_page',
-                }
+                meta: {
+                    title: 'Accueil',
+                    permissions: 'can_see_home_page',
+                },
             },
             {
-                name:"administration",
+                name: 'books',
+                path: '/books',
+                component: BookList,
+                meta: {
+                    title: 'Ouvrages',
+                    permissions: 'can_see_books_page',
+                },
+            },
+            {
+                name: 'loans',
+                path: '/loans',
+                component: LoanList,
+                meta: {
+                    title: 'Emprunts',
+                    permissions: 'can_see_loans_page',
+                },
+            },
+            {
+                name: 'administration',
                 path: '/admin',
-                children:[
+                children: [
                     {
-                        name:"users",
-                        path: 'user',
+                        name: 'users',
+                        path: 'users',
                         component: Users,
-                        meta:{
-                            title:`Utilisateurs`,
-                            permissions : 'can_use_admin_users_page'
-                        }
+                        meta: {
+                            title: 'Utilisateurs',
+                            permissions: 'can_use_admin_users_page',
+                        },
                     },
                     {
-                        name:"permissions",
-                        path: 'permission',
+                        name: 'permissions',
+                        path: 'permissions',
                         component: Permissions,
-                        meta:{
-                            title:`Permissions`,
-                            permissions : 'can_use_admin_permissions_page'
-                        }
+                        meta: {
+                            title: 'Permissions',
+                            permissions: 'can_use_admin_permissions_page',
+                        },
                     },
                     {
-                        name:"roles",
-                        path: 'role',
+                        name: 'roles',
+                        path: 'roles',
                         component: Roles,
-                        meta:{
-                            title:`Roles`,
-                            permissions : 'can_use_admin_roles_page'
-                        }
+                        meta: {
+                            title: 'Roles',
+                            permissions: 'can_use_admin_roles_page',
+                        },
                     },
-                ]
-            }
-        ]
-    }
-]
+                ],
+            },
+        ],
+    },
+];
 
 const router = createRouter({
     history: createWebHistory(window.__ASSET_URL__),
-    routes: routes
+    routes: routes,
 });
 
 router.beforeEach((to, from, next) => {
-    const authStore = useAuthStore()
-    document.title = `fedex-onboarding - ${to.meta.title}`
-    if(to.meta.middleware=="guest"){
-        if(authStore.authenticated){
-            next({name:"home"})
+    const authStore = useAuthStore();
+    document.title = `Bibliothèque Municipale - ${to.meta.title}`;
+
+    if (to.meta.middleware === 'guest') {
+        if (authStore.authenticated) {
+            next({ name: 'home' });
         }
-        next()
-    }else{
-        if(authStore.authenticated){
-            authStore.authcheck()
-            if(authStore.permissions.includes(to.meta.permissions)){
-                next()
-            }else{
-                next({name:authStore.homepage})
+        next();
+    } else {
+        if (authStore.authenticated) {
+            authStore.authcheck();
+            if (authStore.permissions.includes(to.meta.permissions)) {
+                next();
+            } else {
+                next({ name: authStore.homepage });
             }
-        }else{
-            next({name:"login"})
+        } else {
+            next({ name: 'login' });
         }
     }
-})
+});
 
-
-
-export default router
+export default router;

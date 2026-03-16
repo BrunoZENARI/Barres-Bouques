@@ -4,112 +4,91 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Http\Controllers\EnvController;
 use App\Models\Permission;
 use App\Models\Role;
 
 class RoleController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
     /**
-     * Récupération des utilisteurs pour l'interface administrateur.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Retourne la liste paginée des rôles.
      */
-    public function getroles(Request $request)
+    public function index(Request $request)
     {
         $data = json_decode($request->lazyEvent);
 
         $roles = Role::with('permissions');
-        $count = Role::whereRaw("1 = 1");
+        $count = Role::whereRaw('1 = 1');
 
         $env = new EnvController();
-        $count = $env->QueryBuilder($count,$data,true);
-        $roles = $env->QueryBuilder($roles,$data);
-        
-        
-        return json_encode(array('payload' => $roles->get(), 'count' => $count));
+        $count = $env->QueryBuilder($count, $data, true);
+        $roles = $env->QueryBuilder($roles, $data);
+
+        return json_encode(['payload' => $roles->get(), 'count' => $count]);
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Retourne la liste des permissions pour les selects.
      */
-    public function getpermissions(Request $request)
+    public function getPermissions(Request $request)
     {
         $permissions = Permission::all();
-        
-        return json_encode(array('permissions' => $permissions));
+
+        return json_encode(['permissions' => $permissions]);
     }
 
-
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Crée un nouveau rôle.
      */
-    public function createrole(Request $request)
+    public function store(Request $request)
     {
         $data = json_decode($request->role);
         $permissions = json_decode($request->permissions);
 
         $role = new Role();
-        $role->r_slug = $data->r_slug;
-        $role->r_libelle = $data->r_libelle;
+        $role->slug = $data->slug;
+        $role->name = $data->name;
 
         $role->save();
 
         $role->permissions()->sync($permissions);
 
-        
         return json_encode(true);
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Met à jour un rôle existant.
      */
-    public function updaterole(Request $request)
+    public function update(Request $request, $id)
     {
         $data = json_decode($request->role);
         $permissions = json_decode($request->permissions);
 
-        $role = Role::findOrFail($data->id);
-        $role->r_slug = $data->r_slug;
-        $role->r_libelle = $data->r_libelle;
+        $role = Role::findOrFail($id);
+        $role->slug = $data->slug;
+        $role->name = $data->name;
 
         $role->save();
 
         $role->permissions()->sync($permissions);
-        
+
         return json_encode(true);
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Supprime un rôle.
      */
-    public function deleterole(Request $request)
+    public function destroy($id)
     {
-        $data = json_decode($request->role);
-
-        $role = Role::findOrFail($data->id);
+        $role = Role::findOrFail($id);
         $role->permissions()->sync([]);
         $role->delete();
-        
+
         return json_encode(true);
     }
 }

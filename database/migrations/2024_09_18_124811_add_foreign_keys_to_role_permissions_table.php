@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('roles_permissions', function (Blueprint $table) {
-            $table->foreign(['id_role'], 'roles_permissions_ibfk_1')->references(['id'])->on('roles')->onUpdate('restrict')->onDelete('restrict');
-            $table->foreign(['id_permission'], 'roles_permissions_ibfk_2')->references(['id'])->on('permissions')->onUpdate('restrict')->onDelete('restrict');
+        Schema::table('role_permissions', function (Blueprint $table) {
+            $table->foreign('role_id')->references('id')->on('roles')->onUpdate('restrict')->onDelete('restrict');
+            $table->foreign('permission_id')->references('id')->on('permissions')->onUpdate('restrict')->onDelete('restrict');
         });
     }
 
@@ -22,9 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('roles_permissions', function (Blueprint $table) {
-            $table->dropForeign('roles_permissions_ibfk_1');
-            $table->dropForeign('roles_permissions_ibfk_2');
+        Schema::table('role_permissions', function (Blueprint $table) {
+            $table->dropForeign(['role_id']);
+            $table->dropForeign(['permission_id']);
         });
     }
 };
