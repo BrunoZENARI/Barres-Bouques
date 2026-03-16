@@ -1,0 +1,69 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: php8.2-apache-node-composer
+    container_name: WEB_FEDEX_ONBOARDING
+    ports:
+      - "80:80"
+      - "5173:5173"
+    volumes:
+      - .:/var/www/html
+      - ../../data/FEDEX_ONBOARDING:/var/data
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+      - MYSQL_ROOT_PASSWORD=root
+    depends_on:
+      - db
+      - mongodb
+      - redis
+    networks:
+      - app-network
+
+  db:
+    image: mariadb:latest
+    container_name: DB_FEDEX_ONBOARDING
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:6
+    container_name: MONGO_FEDEX_ONBOARDING
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: myUserAdmin
+      MONGO_INITDB_ROOT_PASSWORD: myUserAdmin
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: REDIS_FEDEX_ONBOARDING
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+
+volumes:
+  mariadb_data:
+  mongodb_data:
+  redis_data:
+
+networks:
+  app-network:
+    external: true
