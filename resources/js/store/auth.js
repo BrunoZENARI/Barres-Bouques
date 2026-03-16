@@ -17,12 +17,11 @@ export const useAuthStore = defineStore({
         async login() {
             try {
                 const { data } = await axios.get('/api/user')
-                const permissions = data.role.permissions.map(element => element.p_slug)
-                //alert(permissions)
+                const permissions = data.role.permissions.map(element => element.slug)
                 this.user = data
                 this.permissions = permissions
                 this.authenticated = true
-                
+
                 router.push({ name: 'home' })
             } catch (error) {
                 this.user = {}
@@ -33,7 +32,7 @@ export const useAuthStore = defineStore({
         async authcheck() {
             try {
                 const { data } = await axios.get('/api/user')
-                const permissions = data.role.permissions.map(element => element.p_slug)
+                const permissions = data.role.permissions.map(element => element.slug)
                 
                 this.user = data
                 this.permissions = permissions
