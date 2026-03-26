@@ -3,7 +3,7 @@
         
         <p-menubar :model="items">
             <template #start>
-                <FavIconSVG :mainColor="'var(--p-primary-900)'" class="h-12 w-auto hover:cursor-pointer"  @click="this.$router.push({  name: 'home'});"/>
+                <img src="/images/logo.webp" alt="Logo" class="h-16 w-auto hover:cursor-pointer" @click="this.$router.push({ name: 'home' });" />
             </template>
             <template #end>
                 <p-button label="Déconnexion" icon="pi pi-fw pi-power-off" class="p-button-text p-button-secondary" @click="logout()" :loading="load_button_logout"/>
@@ -20,10 +20,9 @@
 <script>
 import { watch } from 'vue';
 import { useRoute } from 'vue-router';
-import FavIconSVG from '../svg/FavIcon.vue'
-export default { 
+export default {
     name:"layout",
-    components: { FavIconSVG },
+    components: {},
     mounted(){ 
         this.setMenu()
         this.initChangeCurrentRoute()
@@ -73,36 +72,57 @@ export default {
                 });
             }
 
-            if(this.$hasPermission('can_use_admin_users_page')){
-                this.tempitems.push({
-                    label:'Utilisateurs',
-                    icon:'pi pi-fw pi-user',
-                    to:'/admin/user',
+            if(this.$hasPermission('can_see_books_page')){
+                this.items.push({
+                    label:'Ouvrages',
+                    icon:'pi pi-fw pi-book',
+                    to:'/books',
                     command: () => {
-                        this.$router.push('/admin/user');
+                        this.$router.push('/books');
                     }
                 });
             }
 
+            if(this.$hasPermission('can_see_loans_page')){
+                this.items.push({
+                    label:'Emprunts',
+                    icon:'pi pi-fw pi-bookmark',
+                    to:'/loans',
+                    command: () => {
+                        this.$router.push('/loans');
+                    }
+                });
+            }
+
+            if(this.$hasPermission('can_use_admin_users_page')){
+                this.tempitems.push({
+                    label:'Utilisateurs',
+                    icon:'pi pi-fw pi-user',
+                    to:'/admin/users',
+                    command: () => {
+                        this.$router.push('/admin/users');
+                    }
+                });
+            }
 
             if(this.$hasPermission('can_use_admin_roles_page')){
                 this.tempitems.push({
                     label:'Roles',
                     icon:'pi pi-fw pi-address-book',
-                    to:'/admin/role',
+                    to:'/admin/roles',
                     command: () => {
-                        this.$router.push('/admin/role');
+                        this.$router.push('/admin/roles');
                     }
                 });
             }
-            
+
             if(this.$hasPermission('can_use_admin_permissions_page')){
                 this.tempitems.push({
                     label:'Permissions',
                     icon:'pi pi-fw pi-lock',
-                    to:'/admin/permission',
+                    to:'/admin/permissions',
                     command: () => {
-                        this.$router.push('/admin/permission');
+                        this.$router.push('/admin/permissions');
                     }
                 });
             }
