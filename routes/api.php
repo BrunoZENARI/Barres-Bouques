@@ -15,13 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    $info = $request->user();
-
-    $stack = json_decode($info, true);
-    $stack['role'] = json_decode($request->user()->role, true);
-    $stack['role']['permissions'] = json_decode($request->user()->role->permissions, true);
-
-    return json_encode($stack);
+    return response()->json($request->user()->load('role.permissions'));
 });
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum', 'permission:can_use_admin']], function () {

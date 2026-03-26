@@ -4,7 +4,7 @@
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--p-primary-900) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
                     <div class="text-center mb-8">
-                        <LogoSVG class='mb-8 w-16 shrink-0 mx-auto' :mainColor="'var(--p-primary-900)'" :tickColor="'#6CA885'" :dotColor="'#6CA885'" />
+                        <img src="/images/logo.webp" alt="Logo" class="w-40 h-40 mx-auto mb-4">
                         <div class="text-3xl font-medium mb-4">Bienvenue dans un monde merveilleux!</div>
                         <span class="text-muted-color font-medium">Connectez-vous pour continuer</span>
                     </div>
@@ -51,6 +51,7 @@ export default {
                 username:"",
                 password:""
             },
+            username: 'username',
             load_button_logout:false,
             error: "",
             iserror: false,
@@ -62,17 +63,13 @@ export default {
             e.preventDefault()
             this.load_button_logout = true
             await axios.get('/sanctum/csrf-cookie')
-            await axios.post('/login',this.auth).then(({data})=>{
-                if(data == ''){
-                    this.$store.login()
-                }else{
-                    this.error = data[0];
-                    this.iserror = true;
-                }
-            }).catch(({data})=>{
-                this.error = data.message;
+            await axios.post('/login', this.auth).then(() => {
+                this.$store.login()
+            }).catch((error) => {
+                const errors = error.response?.data;
+                this.error = errors?.[this.username]?.[0] ?? 'Identifiants incorrects.';
                 this.iserror = true;
-            }).finally(()=>{
+            }).finally(() => {
                 this.load_button_logout = false;
             })
         },

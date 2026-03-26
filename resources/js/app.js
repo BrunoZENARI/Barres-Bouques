@@ -13,7 +13,7 @@ import { definePreset } from '@primevue/themes';
 import '../css/app.css';
 import 'primeicons/primeicons.css'
 
-import App from './components/App.vue';
+import App from './components/app.vue';
 import router from './router';
 import store from './store';
 import axios from 'axios';
@@ -56,14 +56,14 @@ app.config.globalProperties.$hasPermission = function (value) {
     const authStore = useAuthStore()
     let res = false;
     authStore.permissions.forEach(item => {
-        if(item === value) {
+        if (item === value) {
             res = true;
         }
     });
     return res;
 };
 
-app.use(PrimeVue, { 
+app.use(PrimeVue, {
     theme: {
         preset: definePreset(Aura, {
             primitive: {
@@ -89,7 +89,7 @@ app.use(PrimeVue, {
                 zinc: { 50: '#fafafa', 100: '#f4f4f5', 200: '#e4e4e7', 300: '#d4d4d8', 400: '#a1a1aa', 500: '#71717a', 600: '#52525b', 700: '#3f3f46', 800: '#27272a', 900: '#18181b', 950: '#09090b' },
                 neutral: { 50: '#fafafa', 100: '#f5f5f5', 200: '#e5e5e5', 300: '#d4d4d4', 400: '#a3a3a3', 500: '#737373', 600: '#525252', 700: '#404040', 800: '#262626', 900: '#171717', 950: '#0a0a0a' },
                 stone: { 50: '#fafaf9', 100: '#f5f5f4', 200: '#e7e5e4', 300: '#d6d3d1', 400: '#a8a29e', 500: '#78716c', 600: '#57534e', 700: '#44403c', 800: '#292524', 900: '#1c1917', 950: '#0c0a09' },
-                custom_p:{ 50: '#bfbfbf', 100: '#aeb4b7', 200: '#9da8af', 300: '#8b9da8', 400: '#7a91a0', 500: '#698698', 600: '#587b90', 700: '#476f88', 800: '#356481', 900: '#245879', 950: '#134d71' },
+                custom_p: { 50: '#bfbfbf', 100: '#aeb4b7', 200: '#9da8af', 300: '#8b9da8', 400: '#7a91a0', 500: '#698698', 600: '#587b90', 700: '#476f88', 800: '#356481', 900: '#245879', 950: '#134d71' },
             },
             semantic: {
                 primary: {
@@ -144,9 +144,9 @@ app.use(PrimeVue, {
         cancel: 'Annuler',
         dayNames: ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
         dayNamesShort: ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"],
-        dayNamesMin: ["Di","Lu","Ma","Me","Je","Ve","Sa"],
-        monthNames: ["Janvier","Fevrier","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],
-        monthNamesShort: ["Jan", "Fev", "Mar", "Avr", "Mai", "Jun","Jul", "Aou", "Sep", "Oct", "Nov", "Dec"],
+        dayNamesMin: ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"],
+        monthNames: ["Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
+        monthNamesShort: ["Jan", "Fev", "Mar", "Avr", "Mai", "Jun", "Jul", "Aou", "Sep", "Oct", "Nov", "Dec"],
         today: 'Aujourd\'hui',
         weekHeader: 'Se',
         firstDayOfWeek: 1,
@@ -219,9 +219,9 @@ app.use(PrimeVue, {
         },
         datatable: {
             tbody: 'text-sm',
-            column: {      
+            column: {
                 pcColumnFilterButton: pcColumnFilterButton,
-              }
+            }
         },
     }
 });
@@ -233,7 +233,7 @@ app.use(ToastService);
 app.component('p-inputtext', InputText);
 app.component('p-password', Password);
 app.component('p-button', Button);
-app.component('p-menubar',Menubar)
+app.component('p-menubar', Menubar)
 app.component('p-datatable', DataTable)
 app.component('p-column', Column)
 app.component('p-toast', Toast);
@@ -248,29 +248,29 @@ app.directive('tooltip', Tooltip);
 
 axios.interceptors.response.use(
     (response) => {
-      return response;
+        return response;
     },
     function (error) {
-      if (error.response.status === 401 || error.response.status === 419) {
-        const authStore = useAuthStore()
-        authStore.logout();
-      }
-      if (error.response.status === 500) {
-        app.config.globalProperties.$toast.add({ severity: 'error', summary: 'Erreur', detail: 'Une erreur s\'est produite sur le serveur, merci de contacter un administrateur'});
-      }
-      else{
-        return Promise.reject(error.response)
-      }
-      //return Promise.reject(error.response);
+        if (error.response.status === 401 || error.response.status === 419) {
+            const authStore = useAuthStore()
+            authStore.logout();
+        }
+        if (error.response.status === 500) {
+            app.config.globalProperties.$toast.add({ severity: 'error', summary: 'Erreur', detail: 'Une erreur s\'est produite sur le serveur, merci de contacter un administrateur' });
+        }
+        else {
+            return Promise.reject(error.response)
+        }
+        //return Promise.reject(error.response);
     }
-  );
+);
 
 function pcColumnFilterButton(context) {
     //console.log(context)
     return {
         style: context.instance.hasFilter() ? 'background: var(--p-primary-100)' : '',
         class: context.instance.hasFilter() ? 'p-1' : 'p-1'
-      }
+    }
 }
 
 app.mount('#app');

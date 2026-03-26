@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('author');
             $table->string('isbn')->unique()->nullable();
             $table->string('publisher')->nullable();
-            $table->year('published_year')->nullable();
+            $table->unsignedSmallInteger('published_year')->nullable();
             $table->string('genre')->nullable();
             $table->integer('stock')->default(1);
             $table->timestamps();

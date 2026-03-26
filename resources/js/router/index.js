@@ -107,7 +107,7 @@ router.beforeEach((to, from, next) => {
 
     if (to.meta.middleware === 'guest') {
         if (authStore.authenticated) {
-            next({ name: 'home' });
+            return next({ name: 'home' });
         }
         next();
     } else {
