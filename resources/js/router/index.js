@@ -101,7 +101,7 @@ const router = createRouter({
     routes: routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
     document.title = `Bibliothèque Municipale - ${to.meta.title}`;
 
@@ -112,7 +112,7 @@ router.beforeEach((to, from, next) => {
         next();
     } else {
         if (authStore.authenticated) {
-            authStore.authcheck();
+            await authStore.authcheck();
             if (authStore.permissions.includes(to.meta.permissions)) {
                 next();
             } else {

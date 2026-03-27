@@ -18,7 +18,6 @@ class UserFactory extends Factory
         return [
             'nom'                => fake('fr_FR')->lastName(),
             'prenom'             => fake('fr_FR')->firstName(),
-            'username'           => fake()->unique()->userName(),
             'email'              => fake()->unique()->safeEmail(),
             'role_id'            => null,
             'is_active'          => true,

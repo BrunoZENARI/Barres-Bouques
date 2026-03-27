@@ -30,6 +30,12 @@ class RoleSeeder extends Seeder
             'can_create_loans',
             'can_update_loans',
             'can_delete_loans',
+            'can_use_admin',
+            'can_use_admin_users_page',
+            'can_see_admin_users',
+            'can_create_admin_users',
+            'can_update_admin_users',
+            'can_delete_admin_users',
         ])->pluck('id');
 
         $librarian = Role::firstOrCreate(

@@ -16,7 +16,14 @@ class User extends Authenticatable
     protected $fillable = [
         'nom',
         'prenom',
-        'username',
+        'date_naissance',
+        'telephone',
+        'adresse_numero',
+        'adresse_rue',
+        'adresse_complement1',
+        'adresse_complement2',
+        'adresse_code_postal',
+        'adresse_ville',
         'role_id',
         'is_active',
         'email',
@@ -30,6 +37,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'date_naissance'    => 'date',
     ];
 
     public function role()

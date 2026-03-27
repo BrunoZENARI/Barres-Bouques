@@ -17,11 +17,10 @@ class UserSeeder extends Seeder
 
         // Compte administrateur par défaut
         User::firstOrCreate(
-            ['username' => 'admin'],
+            ['email' => 'admin@bibliotheque.fr'],
             [
                 'nom'       => 'Admin',
                 'prenom'    => 'Super',
-                'email'     => 'admin@bibliotheque.fr',
                 'role_id'   => $adminRole->id,
                 'is_active' => true,
                 'password'  => Hash::make('Admin@1234'),
@@ -30,11 +29,10 @@ class UserSeeder extends Seeder
 
         // Compte bibliothécaire de démonstration
         User::firstOrCreate(
-            ['username' => 'biblio'],
+            ['email' => 'marie.dupont@bibliotheque.fr'],
             [
                 'nom'       => 'Dupont',
                 'prenom'    => 'Marie',
-                'email'     => 'marie.dupont@bibliotheque.fr',
                 'role_id'   => $librarianRole->id,
                 'is_active' => true,
                 'password'  => Hash::make('Biblio@1234'),
