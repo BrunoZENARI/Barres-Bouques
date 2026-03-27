@@ -50,12 +50,19 @@ class UserController extends Controller
         $data = json_decode($request->user);
 
         $user = new User();
-        $user->username = $data->username;
-        $user->nom = $data->nom;
-        $user->prenom = $data->prenom;
-        $user->email = $data->email;
-        $user->role_id = $data->role->id;
-        $user->password = \Hash::make($data->password);
+        $user->nom            = $data->nom;
+        $user->prenom         = $data->prenom;
+        $user->email          = $data->email;
+        $user->date_naissance      = $data->date_naissance ?? null;
+        $user->telephone           = $data->telephone ?? null;
+        $user->adresse_numero      = $data->adresse_numero ?? null;
+        $user->adresse_rue         = $data->adresse_rue ?? null;
+        $user->adresse_complement1 = $data->adresse_complement1 ?? null;
+        $user->adresse_complement2 = $data->adresse_complement2 ?? null;
+        $user->adresse_code_postal = $data->adresse_code_postal ?? null;
+        $user->adresse_ville       = $data->adresse_ville ?? null;
+        $user->role_id             = isset($data->role) ? $data->role->id : Role::where('slug', 'member')->value('id');
+        $user->password            = \Hash::make($data->password ?? 'ChangeMe@1234');
 
         $user->save();
 
@@ -70,11 +77,18 @@ class UserController extends Controller
         $data = json_decode($request->user);
 
         $user = User::findOrFail($id);
-        $user->username = $data->username;
-        $user->nom = $data->nom;
-        $user->prenom = $data->prenom;
-        $user->email = $data->email;
-        $user->role_id = $data->role->id;
+        $user->nom            = $data->nom;
+        $user->prenom         = $data->prenom;
+        $user->email          = $data->email;
+        $user->date_naissance      = $data->date_naissance ?? null;
+        $user->telephone           = $data->telephone ?? null;
+        $user->adresse_numero      = $data->adresse_numero ?? null;
+        $user->adresse_rue         = $data->adresse_rue ?? null;
+        $user->adresse_complement1 = $data->adresse_complement1 ?? null;
+        $user->adresse_complement2 = $data->adresse_complement2 ?? null;
+        $user->adresse_code_postal = $data->adresse_code_postal ?? null;
+        $user->adresse_ville       = $data->adresse_ville ?? null;
+        $user->role_id             = $data->role->id;
 
         $user->save();
 

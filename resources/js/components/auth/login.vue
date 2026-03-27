@@ -12,23 +12,15 @@
                     <form>
                         <div>
                             <p-floatlabel class="mb-8">
-                                <p-inputtext id="username1" type="text"  class="w-full md:w-[30rem]" v-model="auth.username" :invalid="iserror" autocomplete="username" />
-                                <label for="username1">Nom d'utilisateur</label>
+                                <p-inputtext id="email" type="email" class="w-full md:w-[30rem]" v-model="auth.email" :invalid="iserror" autocomplete="email" />
+                                <label for="email">Adresse e-mail</label>
                             </p-floatlabel>
                             <p-floatlabel class="mb-4">
                                 <p-password id="password1" v-model="auth.password" :toggleMask="true" fluid :feedback="false" :invalid="iserror" @keyup.enter="login($event)" :inputProps="{ autocomplete: 'current-password' }"></p-password>
                                 <label for="password1">Mot de passe</label>
                             </p-floatlabel>
-                            
-                            
+
                             <small v-if="iserror" class="text-red-500">{{error}}</small>
-                            <!--<div class="flex items-center justify-between mt-2 mb-8 gap-8">
-                                <div class="flex items-center">
-                                    <Checkbox v-model="checked" id="rememberme1" binary class="mr-2"></Checkbox>
-                                    <label for="rememberme1">Remember me</label>
-                                </div>
-                                <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
-                            </div>-->
                             <p-button label="Sign In" class="mt-4 w-full" @click="login($event)" :disabled="load_button_logout"><i v-if="load_button_logout" class="pi pi-spin pi-spinner mr-3"></i>Connexion</p-button>
                         </div>
                     </form>
@@ -48,10 +40,9 @@ export default {
     data(){
         return {
             auth:{
-                username:"",
+                email:"",
                 password:""
             },
-            username: 'username',
             load_button_logout:false,
             error: "",
             iserror: false,
@@ -67,7 +58,7 @@ export default {
                 this.$store.login()
             }).catch((error) => {
                 const errors = error.response?.data;
-                this.error = errors?.[this.username]?.[0] ?? 'Identifiants incorrects.';
+                this.error = errors?.['email']?.[0] ?? 'Identifiants incorrects.';
                 this.iserror = true;
             }).finally(() => {
                 this.load_button_logout = false;

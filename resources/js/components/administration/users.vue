@@ -52,11 +52,6 @@
                     <p-inputtext v-model="filterModel.value" type="text" />
                 </template>
             </p-column>
-            <p-column field="username" header="Username" sortable style="min-width: 8rem" :showFilterOperator="false" :showAddButton="false">
-                <template #filter="{ filterModel }">
-                    <p-inputtext v-model="filterModel.value" type="text" />
-                </template>
-            </p-column>
             <p-column field="email" header="Email" sortable style="min-width: 10rem" :showFilterOperator="false" :showAddButton="false">
                 <template #filter="{ filterModel }">
                     <p-inputtext v-model="filterModel.value" type="text" />
@@ -106,17 +101,58 @@
                     </div>
                     <div>
                         <p-floatlabel class="mb-4">
-                            <p-inputtext id="username" v-model.trim="user.username" required="true" :invalid="submitted && !user.username" fluid />
-                            <label for="username">Username</label>
-                        </p-floatlabel>
-                        <small v-if="submitted && !user.username" class="text-red-500">Username obligatoire.</small>
-                    </div>
-                    <div>
-                        <p-floatlabel class="mb-4">
                             <p-inputtext id="email" v-model.trim="user.email" required="true" :invalid="submitted && !user.email" fluid />
                             <label for="email">Email</label>
                         </p-floatlabel>
                         <small v-if="submitted && !user.email" class="text-red-500">Email obligatoire.</small>
+                    </div>
+                    <div>
+                        <p-floatlabel class="mb-4">
+                            <p-datepicker id="date_naissance" v-model="user.date_naissance" dateFormat="dd/mm/yy" :maxDate="new Date()" showIcon fluid />
+                            <label for="date_naissance">Date de naissance</label>
+                        </p-floatlabel>
+                    </div>
+                    <div>
+                        <p-floatlabel class="mb-4">
+                            <p-inputtext id="telephone" v-model.trim="user.telephone" fluid />
+                            <label for="telephone">Téléphone</label>
+                        </p-floatlabel>
+                    </div>
+                    <div>
+                        <p-floatlabel class="mb-4">
+                            <p-inputtext id="adresse_numero" v-model.trim="user.adresse_numero" fluid />
+                            <label for="adresse_numero">N°</label>
+                        </p-floatlabel>
+                    </div>
+                    <div>
+                        <p-floatlabel class="mb-4">
+                            <p-inputtext id="adresse_rue" v-model.trim="user.adresse_rue" fluid />
+                            <label for="adresse_rue">Rue</label>
+                        </p-floatlabel>
+                    </div>
+                    <div class="col-span-2">
+                        <p-floatlabel class="mb-4">
+                            <p-inputtext id="adresse_complement1" v-model.trim="user.adresse_complement1" fluid />
+                            <label for="adresse_complement1">Complément 1</label>
+                        </p-floatlabel>
+                    </div>
+                    <div class="col-span-2">
+                        <p-floatlabel class="mb-4">
+                            <p-inputtext id="adresse_complement2" v-model.trim="user.adresse_complement2" fluid />
+                            <label for="adresse_complement2">Complément 2</label>
+                        </p-floatlabel>
+                    </div>
+                    <div>
+                        <p-floatlabel class="mb-4">
+                            <p-inputtext id="adresse_code_postal" v-model.trim="user.adresse_code_postal" fluid />
+                            <label for="adresse_code_postal">Code postal</label>
+                        </p-floatlabel>
+                    </div>
+                    <div>
+                        <p-floatlabel class="mb-4">
+                            <p-inputtext id="adresse_ville" v-model.trim="user.adresse_ville" fluid />
+                            <label for="adresse_ville">Ville</label>
+                        </p-floatlabel>
                     </div>
                     <div v-if="!user.id">
                         <p-floatlabel class="mb-4">
@@ -151,7 +187,7 @@
         <p-dialog v-model:visible="deleteUserDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
-                <span v-if="user">êtes-vous sûr(e) de vouloir supprimer <b>{{ user.username }}</b> ?</span>
+                <span v-if="user">êtes-vous sûr(e) de vouloir supprimer <b>{{ user.prenom }} {{ user.nom }}</b> ?</span>
             </div>
             <template #footer>
                 <p-button label="Non" icon="pi pi-times" text @click="deleteUserDialog = false" />
@@ -272,8 +308,7 @@ export default {
         saveUser() {
             this.submitted = true;
 
-            if (this.user?.username?.trim()
-                && this.user?.nom?.trim()
+            if (this.user?.nom?.trim()
                 && this.user?.email?.trim()
                 && this.user?.prenom?.trim()
                 && this.user?.role) {
@@ -373,7 +408,6 @@ export default {
             this.filters = {
                 nom: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
                 prenom: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-                username: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
                 email: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
                 role_id: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.IN }] },
                 updated_at: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
