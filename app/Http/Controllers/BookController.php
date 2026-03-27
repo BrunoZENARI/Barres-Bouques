@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Book;
 
 class BookController extends Controller
@@ -47,17 +48,19 @@ class BookController extends Controller
         $data = json_decode($request->book);
 
         $book = new Book();
-        $book->title = $data->title;
-        $book->author = $data->author;
-        $book->isbn = $data->isbn ?? null;
-        $book->publisher = $data->publisher ?? null;
+        $book->title          = $data->title;
+        $book->author         = $data->author;
+        $book->isbn           = $data->isbn ?? null;
+        $book->publisher      = $data->publisher ?? null;
         $book->published_year = $data->published_year ?? null;
-        $book->genre = $data->genre ?? null;
-        $book->stock = $data->stock ?? 1;
+        $book->genre          = $data->genre ?? null;
+        $book->location       = $data->location ?? null;
+        $book->description    = $data->description ?? null;
+        $book->stock          = $data->stock ?? 1;
 
         $book->save();
 
-        return json_encode(true);
+        return response()->json($book);
     }
 
     /**
@@ -68,13 +71,15 @@ class BookController extends Controller
         $data = json_decode($request->book);
 
         $book = Book::findOrFail($id);
-        $book->title = $data->title;
-        $book->author = $data->author;
-        $book->isbn = $data->isbn ?? null;
-        $book->publisher = $data->publisher ?? null;
+        $book->title          = $data->title;
+        $book->author         = $data->author;
+        $book->isbn           = $data->isbn ?? null;
+        $book->publisher      = $data->publisher ?? null;
         $book->published_year = $data->published_year ?? null;
-        $book->genre = $data->genre ?? null;
-        $book->stock = $data->stock ?? 1;
+        $book->genre          = $data->genre ?? null;
+        $book->location       = $data->location ?? null;
+        $book->description    = $data->description ?? null;
+        $book->stock          = $data->stock ?? 1;
 
         $book->save();
 
@@ -82,11 +87,38 @@ class BookController extends Controller
     }
 
     /**
-     * Supprime un ouvrage.
+     * Upload ou remplace la couverture d'un ouvrage.
+     */
+    public function uploadCover(Request $request, $id)
+    {
+        $request->validate([
+            'cover' => 'required|image|mimes:jpeg,png,webp|max:2048',
+        ]);
+
+        $book = Book::findOrFail($id);
+
+        if ($book->cover_image) {
+            Storage::disk('public')->delete($book->cover_image);
+        }
+
+        $path = $request->file('cover')->store('covers', 'public');
+        $book->cover_image = $path;
+        $book->save();
+
+        return response()->json(['cover_image' => $path]);
+    }
+
+    /**
+     * Supprime un ouvrage et sa couverture.
      */
     public function destroy($id)
     {
         $book = Book::findOrFail($id);
+
+        if ($book->cover_image) {
+            Storage::disk('public')->delete($book->cover_image);
+        }
+
         $book->delete();
 
         return json_encode(true);

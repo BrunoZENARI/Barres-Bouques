@@ -18,8 +18,18 @@ class Book extends Model
         'publisher',
         'published_year',
         'genre',
+        'location',
+        'description',
+        'cover_image',
         'stock',
     ];
+
+    protected $appends = ['available_stock'];
+
+    public function getAvailableStockAttribute(): int
+    {
+        return $this->stock - $this->loans()->whereNull('return_date')->count();
+    }
 
     public $timestamps = true;
 

@@ -11,7 +11,6 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $memberPermissions = Permission::whereIn('slug', [
-            'can_see_home_page',
             'can_see_books_page',
             'can_see_loans_page',
         ])->pluck('id');
