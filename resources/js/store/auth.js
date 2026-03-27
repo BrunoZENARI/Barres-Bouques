@@ -21,8 +21,9 @@ export const useAuthStore = defineStore({
                 this.user = data
                 this.permissions = permissions
                 this.authenticated = true
+                this.homepage = permissions.includes('can_see_home_page') ? 'home' : 'books'
 
-                router.push({ name: 'home' })
+                router.push({ name: this.homepage })
             } catch (error) {
                 this.user = {}
                 this.permissions = []
@@ -33,10 +34,11 @@ export const useAuthStore = defineStore({
             try {
                 const { data } = await axios.get('/api/user')
                 const permissions = data.role.permissions.map(element => element.slug)
-                
+
                 this.user = data
                 this.permissions = permissions
                 this.authenticated = true
+                this.homepage = permissions.includes('can_see_home_page') ? 'home' : 'books'
             } catch (error) {
                 this.user = {}
                 this.permissions = []

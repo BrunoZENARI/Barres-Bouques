@@ -33,6 +33,28 @@ class LoanController extends Controller
     }
 
     /**
+     * Retourne les statistiques pour le tableau de bord.
+     */
+    public function stats()
+    {
+        $today = Carbon::today();
+
+        $overdueCount = Loan::whereNull('return_date')
+            ->where('due_date', '<', $today)
+            ->count();
+
+        $dueTodayLoans = Loan::with(['user', 'book'])
+            ->whereNull('return_date')
+            ->whereDate('due_date', $today)
+            ->get();
+
+        return response()->json([
+            'overdue_count'   => $overdueCount,
+            'due_today_loans' => $dueTodayLoans,
+        ]);
+    }
+
+    /**
      * Retourne le détail d'un emprunt.
      */
     public function show($id)

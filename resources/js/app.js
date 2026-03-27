@@ -35,6 +35,8 @@ import Select from 'primevue/select';
 import MultiSelect from 'primevue/multiselect';
 import DatePicker from 'primevue/datepicker';
 import Checkbox from 'primevue/checkbox';
+import InputNumber from 'primevue/inputnumber';
+import Textarea from 'primevue/textarea';
 
 import { root } from 'postcss';
 
@@ -244,6 +246,8 @@ app.component('p-select', Select)
 app.component('p-multiselect', MultiSelect)
 app.component('p-datepicker', DatePicker)
 app.component('p-checkbox', Checkbox)
+app.component('p-inputnumber', InputNumber)
+app.component('p-textarea', Textarea)
 app.directive('tooltip', Tooltip);
 
 axios.interceptors.response.use(

@@ -54,11 +54,13 @@ Route::group(['prefix' => 'books', 'middleware' => ['auth:sanctum']], function (
     Route::get('/{id}', [BookController::class, 'show'])->name('books.show');
     Route::post('/', [BookController::class, 'store'])->name('books.store');
     Route::put('/{id}', [BookController::class, 'update'])->name('books.update');
+    Route::post('/{id}/cover', [BookController::class, 'uploadCover'])->name('books.cover');
     Route::delete('/{id}', [BookController::class, 'destroy'])->name('books.destroy');
 });
 
 // Gestion des emprunts
 Route::group(['prefix' => 'loans', 'middleware' => ['auth:sanctum']], function () {
+    Route::get('/stats', [LoanController::class, 'stats'])->name('loans.stats');
     Route::post('/search', [LoanController::class, 'index'])->name('loans.index');
     Route::get('/{id}', [LoanController::class, 'show'])->name('loans.show');
     Route::post('/', [LoanController::class, 'store'])->name('loans.store');
