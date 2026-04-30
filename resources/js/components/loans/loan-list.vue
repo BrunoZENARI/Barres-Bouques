@@ -40,9 +40,12 @@
                 </div>
             </template>
             <template #empty>Aucun emprunt trouvé</template>
-            <p-column field="user.nom" header="Emprunteur" sortable style="min-width: 12rem">
+            <p-column field="user.nom" header="Emprunteur" sortable filterField="user_search" style="min-width: 12rem" :showFilterOperator="false" :showAddButton="false">
                 <template #body="{data}">
                     {{ data.user.prenom }} {{ data.user.nom }}
+                </template>
+                <template #filter="{ filterModel }">
+                    <p-inputtext v-model="filterModel.value" type="text" placeholder="Nom ou prénom..." />
                 </template>
             </p-column>
             <p-column field="book.title" header="Ouvrage" sortable style="min-width: 16rem">
@@ -300,7 +303,9 @@ export default {
             return !loan.return_date && new Date(loan.due_date) < new Date();
         },
         initFilters() {
-            this.filters = {};
+            this.filters = {
+                user_search: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
+            };
         },
         formatDate(value) {
             if (!value) return '';
