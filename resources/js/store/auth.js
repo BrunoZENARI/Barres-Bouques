@@ -21,7 +21,9 @@ export const useAuthStore = defineStore({
                 this.user = data
                 this.permissions = permissions
                 this.authenticated = true
-                this.homepage = permissions.includes('can_see_home_page') ? 'home' : 'books'
+                this.homepage = permissions.includes('can_see_home_page') ? 'home'
+                    : permissions.includes('can_see_member_portal') ? 'account'
+                    : 'books'
 
                 router.push({ name: this.homepage })
             } catch (error) {
@@ -38,7 +40,9 @@ export const useAuthStore = defineStore({
                 this.user = data
                 this.permissions = permissions
                 this.authenticated = true
-                this.homepage = permissions.includes('can_see_home_page') ? 'home' : 'books'
+                this.homepage = permissions.includes('can_see_home_page') ? 'home'
+                    : permissions.includes('can_see_member_portal') ? 'account'
+                    : 'books'
             } catch (error) {
                 this.user = {}
                 this.permissions = []
