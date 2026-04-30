@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\ReminderController;
+use App\Http\Controllers\StatController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -69,6 +70,16 @@ Route::group(['prefix' => 'loans', 'middleware' => ['auth:sanctum']], function (
     Route::post('/', [LoanController::class, 'store'])->name('loans.store');
     Route::put('/{id}', [LoanController::class, 'update'])->name('loans.update');
     Route::delete('/{id}', [LoanController::class, 'destroy'])->name('loans.destroy');
+});
+
+// Statistiques
+Route::group(['prefix' => 'stats', 'middleware' => ['auth:sanctum']], function () {
+    Route::get('/kpis', [StatController::class, 'kpis'])->name('stats.kpis');
+    Route::get('/loans-by-period', [StatController::class, 'loansByPeriod'])->name('stats.loans-by-period');
+    Route::get('/top-books', [StatController::class, 'topBooks'])->name('stats.top-books');
+    Route::get('/low-activity-books', [StatController::class, 'lowActivityBooks'])->name('stats.low-activity-books');
+    Route::get('/loan-status', [StatController::class, 'loanStatus'])->name('stats.loan-status');
+    Route::get('/export-csv', [StatController::class, 'exportCsv'])->name('stats.export-csv');
 });
 
 // Gestion des rappels

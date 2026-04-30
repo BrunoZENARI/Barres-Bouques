@@ -105,6 +105,17 @@ export default {
                 });
             }
 
+            if(this.$hasPermission('can_see_stats_page')){
+                this.items.push({
+                    label:'Statistiques',
+                    icon:'pi pi-fw pi-chart-bar',
+                    to:'/stats',
+                    command: () => {
+                        this.$router.push('/stats');
+                    }
+                });
+            }
+
             if(this.$hasPermission('can_use_admin_users_page')){
                 this.tempitems.push({
                     label:'Utilisateurs',
