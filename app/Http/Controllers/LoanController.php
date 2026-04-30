@@ -22,11 +22,51 @@ class LoanController extends Controller
     {
         $data = json_decode($request->lazyEvent);
 
+        // Extraire le filtre emprunteur (traité manuellement via join)
+        $userSearch = $data->filters->user_search->constraints[0]->value ?? null;
+        unset($data->filters->user_search);
+
+        // Remapper les sortFields relation → colonne SQL joinée
+        $sortMap = ['user.nom' => 'users.nom', 'book.title' => 'books.title'];
+        if (!empty($data->sortField) && isset($sortMap[$data->sortField])) {
+            $data->sortField = $sortMap[$data->sortField];
+        }
+
+        $joinUsers = !empty($userSearch) || ($data->sortField ?? '') === 'users.nom';
+
+        // Query principale
         $loans = Loan::with(['user', 'book']);
-        $count = Loan::whereRaw('1 = 1');
+        if ($joinUsers) {
+            $loans->join('users', 'loans.user_id', '=', 'users.id')
+                  ->select('loans.*');
+        }
+        if (!empty($userSearch)) {
+            $loans->where(function ($q) use ($userSearch) {
+                $q->where('users.nom', 'LIKE', "%{$userSearch}%")
+                  ->orWhere('users.prenom', 'LIKE', "%{$userSearch}%")
+                  ->orWhereRaw("CONCAT(users.prenom, ' ', users.nom) LIKE ?", ["%{$userSearch}%"])
+                  ->orWhereRaw("CONCAT(users.nom, ' ', users.prenom) LIKE ?", ["%{$userSearch}%"]);
+            });
+        }
+
+        // Query de comptage (sans join pour éviter les doublons)
+        $countQuery = Loan::query();
+        if (!empty($userSearch)) {
+            $countQuery->whereHas('user', function ($q) use ($userSearch) {
+                $q->where('nom', 'LIKE', "%{$userSearch}%")
+                  ->orWhere('prenom', 'LIKE', "%{$userSearch}%")
+                  ->orWhereRaw("CONCAT(prenom, ' ', nom) LIKE ?", ["%{$userSearch}%"])
+                  ->orWhereRaw("CONCAT(nom, ' ', prenom) LIKE ?", ["%{$userSearch}%"]);
+            });
+        }
+
+        // Pour le count, utiliser un sortField sûr (ORDER BY ignoré sur COUNT mais la colonne doit exister)
+        $countData = clone $data;
+        $countData->sortField = 'id';
+        $countData->sortOrder = '1';
 
         $env = new EnvController();
-        $count = $env->QueryBuilder($count, $data, true);
+        $count = $env->QueryBuilder($countQuery, $countData, true);
         $loans = $env->QueryBuilder($loans, $data);
 
         return json_encode(['payload' => $loans->get(), 'count' => $count]);
