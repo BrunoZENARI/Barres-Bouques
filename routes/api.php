@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\LoanController;
+use App\Http\Controllers\ReminderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -68,4 +69,14 @@ Route::group(['prefix' => 'loans', 'middleware' => ['auth:sanctum']], function (
     Route::post('/', [LoanController::class, 'store'])->name('loans.store');
     Route::put('/{id}', [LoanController::class, 'update'])->name('loans.update');
     Route::delete('/{id}', [LoanController::class, 'destroy'])->name('loans.destroy');
+});
+
+// Gestion des rappels
+Route::group(['prefix' => 'reminders', 'middleware' => ['auth:sanctum']], function () {
+    Route::get('/settings', [ReminderController::class, 'getSettings'])->name('reminders.settings.get');
+    Route::put('/settings', [ReminderController::class, 'updateSettings'])->name('reminders.settings.update');
+    Route::get('/overdue', [ReminderController::class, 'getOverdueLoans'])->name('reminders.overdue');
+    Route::get('/due-soon', [ReminderController::class, 'getDueSoonLoans'])->name('reminders.due-soon');
+    Route::post('/send-all', [ReminderController::class, 'sendAll'])->name('reminders.send-all');
+    Route::post('/{id}/send', [ReminderController::class, 'sendReminder'])->name('reminders.send');
 });

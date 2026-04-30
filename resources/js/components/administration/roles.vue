@@ -237,7 +237,7 @@ export default {
                             this.selectedPermissions = [];
                         });
                 } else {
-                    this.$axios.post('/api/admin/roles/', { role: JSON.stringify(this.role), permissions: JSON.stringify(this.selectedPermissions) })
+                    this.$axios.post('/api/admin/roles', { role: JSON.stringify(this.role), permissions: JSON.stringify(this.selectedPermissions) })
                         .then(() => {
                             this.loadLazyData();
                             this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Role créé.', life: 3000 });
