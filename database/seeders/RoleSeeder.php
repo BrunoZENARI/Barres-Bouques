@@ -30,6 +30,8 @@ class RoleSeeder extends Seeder
             'can_create_loans',
             'can_update_loans',
             'can_delete_loans',
+            'can_see_reminders_page',
+            'can_see_stats_page',
             'can_use_admin',
             'can_use_admin_users_page',
             'can_see_admin_users',

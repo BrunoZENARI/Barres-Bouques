@@ -15,6 +15,7 @@ import Roles from '../components/administration/roles.vue';
 import BookList from '../components/books/book-list.vue';
 import LoanList from '../components/loans/loan-list.vue';
 import ReminderManagement from '../components/loans/reminder-management.vue';
+import StatsDashboard from '../components/statistics/stats-dashboard.vue';
 
 export const routes = [
     {
@@ -67,6 +68,15 @@ export const routes = [
                 meta: {
                     title: 'Rappels',
                     permissions: 'can_see_reminders_page',
+                },
+            },
+            {
+                name: 'stats',
+                path: '/stats',
+                component: StatsDashboard,
+                meta: {
+                    title: 'Statistiques',
+                    permissions: 'can_see_stats_page',
                 },
             },
             {

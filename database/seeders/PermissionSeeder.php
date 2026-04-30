@@ -25,6 +25,12 @@ class PermissionSeeder extends Seeder
             ['slug' => 'can_update_loans',           'name' => 'Peut enregistrer des retours',              'category' => 'LOANS'],
             ['slug' => 'can_delete_loans',           'name' => 'Peut supprimer des emprunts',               'category' => 'LOANS'],
 
+            // Rappels
+            ['slug' => 'can_see_reminders_page',     'name' => 'Peut accéder à la page des rappels',        'category' => 'REMINDERS'],
+
+            // Statistiques
+            ['slug' => 'can_see_stats_page',         'name' => 'Peut accéder à la page des statistiques',  'category' => 'STATISTICS'],
+
             // Administration générale
             ['slug' => 'can_use_admin',              'name' => 'Peut accéder à l\'interface d\'administration', 'category' => 'ADMINISTRATION'],
 
