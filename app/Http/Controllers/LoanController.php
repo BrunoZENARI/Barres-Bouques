@@ -55,6 +55,44 @@ class LoanController extends Controller
     }
 
     /**
+     * Recherche d'utilisateurs pour l'autocomplétion (par nom, prénom ou email).
+     */
+    public function searchUsers(Request $request)
+    {
+        $q = $request->q;
+
+        $users = User::where(function ($query) use ($q) {
+                $query->where('nom', 'like', "%{$q}%")
+                      ->orWhere('prenom', 'like', "%{$q}%")
+                      ->orWhere('email', 'like', "%{$q}%")
+                      ->orWhereRaw("CONCAT(prenom, ' ', nom) LIKE ?", ["%{$q}%"])
+                      ->orWhereRaw("CONCAT(nom, ' ', prenom) LIKE ?", ["%{$q}%"]);
+            })
+            ->limit(10)
+            ->get(['id', 'nom', 'prenom', 'email']);
+
+        return response()->json($users);
+    }
+
+    /**
+     * Recherche de livres disponibles pour l'autocomplétion (par titre ou auteur).
+     */
+    public function searchBooks(Request $request)
+    {
+        $q = $request->q;
+
+        $books = Book::where(function ($query) use ($q) {
+                $query->where('title', 'like', "%{$q}%")
+                      ->orWhere('author', 'like', "%{$q}%");
+            })
+            ->whereRaw('stock > (SELECT COUNT(*) FROM loans WHERE loans.book_id = books.id AND loans.return_date IS NULL)')
+            ->limit(10)
+            ->get(['id', 'title', 'author']);
+
+        return response()->json($books);
+    }
+
+    /**
      * Retourne le détail d'un emprunt.
      */
     public function show($id)
@@ -65,22 +103,23 @@ class LoanController extends Controller
     }
 
     /**
-     * Crée un nouvel emprunt.
+     * Crée un ou plusieurs emprunts (un par livre sélectionné).
      */
     public function store(Request $request)
     {
         $data = json_decode($request->loan);
 
         $loanDate = Carbon::today();
-        $dueDate = Carbon::today()->addDays(14);
+        $dueDate  = Carbon::parse($data->due_date);
 
-        $loan = new Loan();
-        $loan->user_id = $data->user_id;
-        $loan->book_id = $data->book_id;
-        $loan->loan_date = $loanDate;
-        $loan->due_date = $dueDate;
-
-        $loan->save();
+        foreach ($data->books as $book) {
+            $loan = new Loan();
+            $loan->user_id   = $data->user->id;
+            $loan->book_id   = $book->id;
+            $loan->loan_date = $loanDate;
+            $loan->due_date  = $dueDate;
+            $loan->save();
+        }
 
         return json_encode(true);
     }

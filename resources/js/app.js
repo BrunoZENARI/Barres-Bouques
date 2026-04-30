@@ -37,6 +37,7 @@ import DatePicker from 'primevue/datepicker';
 import Checkbox from 'primevue/checkbox';
 import InputNumber from 'primevue/inputnumber';
 import Textarea from 'primevue/textarea';
+import AutoComplete from 'primevue/autocomplete';
 
 import { root } from 'postcss';
 
@@ -248,6 +249,7 @@ app.component('p-datepicker', DatePicker)
 app.component('p-checkbox', Checkbox)
 app.component('p-inputnumber', InputNumber)
 app.component('p-textarea', Textarea)
+app.component('p-autocomplete', AutoComplete)
 app.directive('tooltip', Tooltip);
 
 axios.interceptors.response.use(

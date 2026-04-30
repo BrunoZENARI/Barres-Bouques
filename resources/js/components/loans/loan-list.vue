@@ -85,25 +85,65 @@
             </p-column>
         </p-datatable>
 
-        <p-dialog v-model:visible="loanDialog" :style="{ width: '40vw' }" :breakpoints="{ '1199px': '60vw', '575px': '90vw' }" header="Nouvel emprunt" :modal="true">
-            <form autocomplete="off">
-                <div class="grid grid-cols-1 gap-4 mt-4">
-                    <div>
-                        <p-floatlabel class="mb-4">
-                            <p-inputnumber id="user_id" v-model="loan.user_id" :invalid="submitted && !loan.user_id" fluid />
-                            <label for="user_id">ID Utilisateur</label>
-                        </p-floatlabel>
-                        <small v-if="submitted && !loan.user_id" class="text-red-500">Utilisateur obligatoire.</small>
-                    </div>
-                    <div>
-                        <p-floatlabel class="mb-4">
-                            <p-inputnumber id="book_id" v-model="loan.book_id" :invalid="submitted && !loan.book_id" fluid />
-                            <label for="book_id">ID Ouvrage</label>
-                        </p-floatlabel>
-                        <small v-if="submitted && !loan.book_id" class="text-red-500">Ouvrage obligatoire.</small>
+        <p-dialog v-model:visible="loanDialog" :style="{ width: '50vw' }" :breakpoints="{ '1199px': '70vw', '575px': '95vw' }" header="Nouvel emprunt" :modal="true">
+            <div class="flex flex-col gap-5 mt-4">
+
+                <!-- Adhérent -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Adhérent <span class="text-red-500">*</span></label>
+                    <p-autocomplete
+                        v-model="loan.user"
+                        :suggestions="userSuggestions"
+                        @complete="searchUsers"
+                        :optionLabel="u => `${u.nom} ${u.prenom} — ${u.email}`"
+                        placeholder="Rechercher par nom ou email..."
+                        :invalid="submitted && !loan.user"
+                        fluid
+                    />
+                    <small v-if="submitted && !loan.user" class="text-red-500">Adhérent obligatoire.</small>
+                </div>
+
+                <!-- Ouvrages -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ouvrages <span class="text-red-500">*</span></label>
+                    <p-autocomplete
+                        v-model="bookSearch"
+                        :suggestions="bookSuggestions"
+                        @complete="searchBooks"
+                        @item-select="addBook"
+                        :optionLabel="b => `${b.title} — ${b.author}`"
+                        placeholder="Rechercher un ouvrage disponible..."
+                        :invalid="submitted && loan.books.length === 0"
+                        fluid
+                    />
+                    <small v-if="submitted && loan.books.length === 0" class="text-red-500">Au moins un ouvrage obligatoire.</small>
+                    <div v-if="loan.books.length > 0" class="mt-3 flex flex-col gap-2">
+                        <div
+                            v-for="book in loan.books"
+                            :key="book.id"
+                            class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-3 py-2"
+                        >
+                            <span class="text-sm"><span class="font-medium">{{ book.title }}</span> <span class="text-gray-500">— {{ book.author }}</span></span>
+                            <p-button icon="pi pi-times" text rounded size="small" severity="danger" @click="removeBook(book)" />
+                        </div>
                     </div>
                 </div>
-            </form>
+
+                <!-- Date de retour -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date de retour prévue <span class="text-red-500">*</span></label>
+                    <p-datepicker
+                        v-model="loan.due_date"
+                        dateFormat="dd/mm/yy"
+                        :minDate="minDueDate"
+                        showIcon
+                        :invalid="submitted && !loan.due_date"
+                        fluid
+                    />
+                    <small v-if="submitted && !loan.due_date" class="text-red-500">Date de retour obligatoire.</small>
+                </div>
+
+            </div>
 
             <template #footer>
                 <p-button label="Annuler" icon="pi pi-times" text @click="hideDialog" />
@@ -130,7 +170,7 @@ export default {
     data() {
         return {
             loans: [],
-            loan: {},
+            loan: { books: [] },
             lazyParams: {},
             filters: null,
             loading_table: true,
@@ -140,6 +180,10 @@ export default {
             loanDialog: false,
             deleteLoanDialog: false,
             totalRecords: 0,
+            userSuggestions: [],
+            bookSuggestions: [],
+            bookSearch: null,
+            minDueDate: (() => { const d = new Date(); d.setDate(d.getDate() + 1); return d; })(),
         };
     },
     mounted() {
@@ -184,7 +228,8 @@ export default {
             this.loadLazyData();
         },
         openNew() {
-            this.loan = {};
+            this.loan = { books: [] };
+            this.bookSearch = null;
             this.submitted = false;
             this.loanDialog = true;
         },
@@ -192,20 +237,38 @@ export default {
             this.submitted = false;
             this.loanDialog = false;
         },
+        searchUsers(event) {
+            this.$axios.get('/api/loans/autocomplete/users', { params: { q: event.query } })
+                .then(response => { this.userSuggestions = response.data; });
+        },
+        searchBooks(event) {
+            this.$axios.get('/api/loans/autocomplete/books', { params: { q: event.query } })
+                .then(response => { this.bookSuggestions = response.data; });
+        },
+        addBook(event) {
+            const book = event.value;
+            if (!this.loan.books.find(b => b.id === book.id)) {
+                this.loan.books.push(book);
+            }
+            this.$nextTick(() => { this.bookSearch = null; });
+        },
+        removeBook(book) {
+            this.loan.books = this.loan.books.filter(b => b.id !== book.id);
+        },
         saveLoan() {
             this.submitted = true;
 
-            if (this.loan?.user_id && this.loan?.book_id) {
+            if (this.loan?.user && this.loan.books.length > 0 && this.loan?.due_date) {
                 this.load_button_save = true;
-                this.$axios.post('/api/loans/', { loan: JSON.stringify(this.loan) })
+                this.$axios.post('/api/loans', { loan: JSON.stringify(this.loan) })
                     .then(() => {
                         this.loadLazyData();
-                        this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Emprunt enregistré.', life: 3000 });
+                        this.$toast.add({ severity: 'success', summary: 'Enregistré', detail: 'Emprunt(s) créé(s) avec succès.', life: 3000 });
+                        this.loanDialog = false;
+                        this.loan = { books: [] };
                     })
                     .finally(() => {
                         this.load_button_save = false;
-                        this.loanDialog = false;
-                        this.loan = {};
                     });
             }
         },
