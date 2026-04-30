@@ -61,6 +61,8 @@ Route::group(['prefix' => 'books', 'middleware' => ['auth:sanctum']], function (
 // Gestion des emprunts
 Route::group(['prefix' => 'loans', 'middleware' => ['auth:sanctum']], function () {
     Route::get('/stats', [LoanController::class, 'stats'])->name('loans.stats');
+    Route::get('/autocomplete/users', [LoanController::class, 'searchUsers'])->name('loans.autocomplete.users');
+    Route::get('/autocomplete/books', [LoanController::class, 'searchBooks'])->name('loans.autocomplete.books');
     Route::post('/search', [LoanController::class, 'index'])->name('loans.index');
     Route::get('/{id}', [LoanController::class, 'show'])->name('loans.show');
     Route::post('/', [LoanController::class, 'store'])->name('loans.store');
