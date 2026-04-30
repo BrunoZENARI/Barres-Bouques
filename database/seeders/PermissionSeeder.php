@@ -31,6 +31,12 @@ class PermissionSeeder extends Seeder
             // Statistiques
             ['slug' => 'can_see_stats_page',         'name' => 'Peut accéder à la page des statistiques',  'category' => 'STATISTICS'],
 
+            // Espace adhérent
+            ['slug' => 'can_see_member_portal',   'name' => 'Peut accéder à l\'espace adhérent',  'category' => 'MEMBER'],
+
+            // Réservations
+            ['slug' => 'can_manage_reservations', 'name' => 'Peut gérer les réservations',         'category' => 'RESERVATIONS'],
+
             // Administration générale
             ['slug' => 'can_use_admin',              'name' => 'Peut accéder à l\'interface d\'administration', 'category' => 'ADMINISTRATION'],
 

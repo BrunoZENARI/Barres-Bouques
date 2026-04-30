@@ -12,7 +12,7 @@ class RoleSeeder extends Seeder
     {
         $memberPermissions = Permission::whereIn('slug', [
             'can_see_books_page',
-            'can_see_loans_page',
+            'can_see_member_portal',
         ])->pluck('id');
 
         $member = Role::firstOrCreate(
@@ -32,6 +32,8 @@ class RoleSeeder extends Seeder
             'can_delete_loans',
             'can_see_reminders_page',
             'can_see_stats_page',
+            'can_see_member_portal',
+            'can_manage_reservations',
             'can_use_admin',
             'can_use_admin_users_page',
             'can_see_admin_users',

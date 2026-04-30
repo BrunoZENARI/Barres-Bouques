@@ -91,3 +91,30 @@ Route::group(['prefix' => 'reminders', 'middleware' => ['auth:sanctum']], functi
     Route::post('/send-all', [ReminderController::class, 'sendAll'])->name('reminders.send-all');
     Route::post('/{id}/send', [ReminderController::class, 'sendReminder'])->name('reminders.send');
 });
+
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\Auth\PasswordResetController;
+
+// Espace adhérent
+Route::group(['prefix' => 'account', 'middleware' => ['auth:sanctum']], function () {
+    Route::get('/loans', [AccountController::class, 'loans'])->name('account.loans');
+    Route::get('/profile', [AccountController::class, 'profile'])->name('account.profile');
+    Route::put('/profile', [AccountController::class, 'updateProfile'])->name('account.profile.update');
+    Route::patch('/password', [AccountController::class, 'changePassword'])->name('account.password');
+    Route::get('/reservations', [ReservationController::class, 'myReservations'])->name('account.reservations');
+    Route::post('/reservations', [ReservationController::class, 'store'])->name('account.reservations.store');
+    Route::delete('/reservations/{id}', [ReservationController::class, 'cancel'])->name('account.reservations.cancel');
+});
+
+// Gestion des réservations (bibliothécaire)
+Route::group(['prefix' => 'reservations', 'middleware' => ['auth:sanctum']], function () {
+    Route::get('/', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::patch('/{id}/ready', [ReservationController::class, 'markReady'])->name('reservations.ready');
+    Route::post('/{id}/collect', [ReservationController::class, 'collect'])->name('reservations.collect');
+    Route::delete('/{id}', [ReservationController::class, 'reject'])->name('reservations.reject');
+});
+
+// Réinitialisation du mot de passe (guest)
+Route::post('/forgot-password', [PasswordResetController::class, 'send'])->name('password.forgot');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.reset');

@@ -3,6 +3,7 @@ import { useAuthStore } from '@/store/auth';
 
 /* Guest Component */
 import Login from '../components/auth/login.vue';
+import ResetPassword from '../components/auth/reset-password.vue';
 
 /* Layout */
 import Layout from '../components/layouts/layout.vue';
@@ -16,6 +17,8 @@ import BookList from '../components/books/book-list.vue';
 import LoanList from '../components/loans/loan-list.vue';
 import ReminderManagement from '../components/loans/reminder-management.vue';
 import StatsDashboard from '../components/statistics/stats-dashboard.vue';
+import AccountPortal from '../components/account/portal.vue';
+import ReservationManagement from '../components/loans/reservation-management.vue';
 
 export const routes = [
     {
@@ -26,6 +29,12 @@ export const routes = [
             middleware: 'guest',
             title: 'Connexion',
         },
+    },
+    {
+        name: 'reset-password',
+        path: '/reset-password',
+        component: ResetPassword,
+        meta: { middleware: 'guest', title: 'Réinitialisation du mot de passe' },
     },
     {
         path: '/',
@@ -69,6 +78,18 @@ export const routes = [
                     title: 'Rappels',
                     permissions: 'can_see_reminders_page',
                 },
+            },
+            {
+                name: 'account',
+                path: '/account',
+                component: AccountPortal,
+                meta: { title: 'Mon compte', permissions: 'can_see_member_portal' },
+            },
+            {
+                name: 'reservations-mgmt',
+                path: '/reservations-mgmt',
+                component: ReservationManagement,
+                meta: { title: 'Réservations', permissions: 'can_manage_reservations' },
             },
             {
                 name: 'stats',

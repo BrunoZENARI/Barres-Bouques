@@ -93,10 +93,16 @@
                         <div class="mt-3">
                             <button
                                 v-if="book.available_stock > 0"
-                                class="w-full bg-[#6CA885] hover:bg-[#5a9070] text-white font-semibold py-2.5 rounded-xl transition-colors text-sm"
+                                :class="[
+                                    'w-full font-semibold py-2.5 rounded-xl transition-colors text-sm',
+                                    isInCart(book)
+                                        ? 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                                        : 'bg-[#6CA885] hover:bg-[#5a9070] text-white'
+                                ]"
                                 @click="reserve(book)"
                             >
-                                Réserver (Click &amp; Collect)
+                                <i :class="isInCart(book) ? 'pi pi-shopping-bag' : 'pi pi-calendar-plus'" class="mr-2"></i>
+                                {{ isInCart(book) ? 'Dans le panier' : 'Réserver (Click &amp; Collect)' }}
                             </button>
                             <button v-else disabled class="w-full bg-gray-100 text-gray-400 font-semibold py-2.5 rounded-xl text-sm cursor-not-allowed">
                                 Indisponible
@@ -211,6 +217,7 @@
 </template>
 
 <script>
+import { useCartStore } from '@/store/cart';
 export default {
     name: 'book-list',
     data() {
@@ -334,7 +341,16 @@ export default {
                 });
         },
         reserve(book) {
-            this.$toast.add({ severity: 'info', summary: 'Réservation', detail: `"${book.title}" ajouté à vos réservations.`, life: 3000 });
+            const cart = useCartStore();
+            if (cart.hasBook(book.id)) {
+                this.$toast.add({ severity: 'warn', summary: 'Déjà dans le panier', detail: `"${book.title}" est déjà dans votre panier.`, life: 3000 });
+            } else {
+                cart.addBook(book);
+                this.$toast.add({ severity: 'success', summary: 'Ajouté au panier', detail: `"${book.title}" ajouté. Ouvrez votre panier pour confirmer.`, life: 4000 });
+            }
+        },
+        isInCart(book) {
+            return useCartStore().hasBook(book.id);
         },
     },
 };
