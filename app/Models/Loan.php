@@ -41,4 +41,9 @@ class Loan extends Model
     {
         return $this->return_date !== null;
     }
+
+    public function reminders()
+    {
+        return $this->hasMany(LoanReminder::class, 'loan_id');
+    }
 }

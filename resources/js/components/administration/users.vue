@@ -327,7 +327,7 @@ export default {
                         });
                 } else {
                     if (this.user?.password && this.user?.cpassword && this.user?.password === this.user?.cpassword) {
-                        this.$axios.post('/api/admin/users/', { user: JSON.stringify(this.user) })
+                        this.$axios.post('/api/admin/users', { user: JSON.stringify(this.user) })
                             .then(() => {
                                 this.loadLazyData();
                                 this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Utilisateur créé.', life: 3000 });

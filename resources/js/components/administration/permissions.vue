@@ -209,7 +209,7 @@ export default {
                             this.permission = {};
                         });
                 } else {
-                    this.$axios.post('/api/admin/permissions/', { permission: JSON.stringify(this.permission) })
+                    this.$axios.post('/api/admin/permissions', { permission: JSON.stringify(this.permission) })
                         .then(() => {
                             this.loadLazyData();
                             this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Permission créée.', life: 3000 });

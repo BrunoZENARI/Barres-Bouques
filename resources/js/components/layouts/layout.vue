@@ -94,6 +94,17 @@ export default {
                 });
             }
 
+            if(this.$hasPermission('can_see_reminders_page')){
+                this.items.push({
+                    label:'Rappels',
+                    icon:'pi pi-fw pi-bell',
+                    to:'/reminders',
+                    command: () => {
+                        this.$router.push('/reminders');
+                    }
+                });
+            }
+
             if(this.$hasPermission('can_use_admin_users_page')){
                 this.tempitems.push({
                     label:'Utilisateurs',

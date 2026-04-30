@@ -14,6 +14,7 @@ import Permissions from '../components/administration/permissions.vue';
 import Roles from '../components/administration/roles.vue';
 import BookList from '../components/books/book-list.vue';
 import LoanList from '../components/loans/loan-list.vue';
+import ReminderManagement from '../components/loans/reminder-management.vue';
 
 export const routes = [
     {
@@ -57,6 +58,15 @@ export const routes = [
                 meta: {
                     title: 'Emprunts',
                     permissions: 'can_see_loans_page',
+                },
+            },
+            {
+                name: 'reminders',
+                path: '/reminders',
+                component: ReminderManagement,
+                meta: {
+                    title: 'Rappels',
+                    permissions: 'can_see_reminders_page',
                 },
             },
             {

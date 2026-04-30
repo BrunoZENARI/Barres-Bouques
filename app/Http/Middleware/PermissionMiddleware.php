@@ -19,13 +19,17 @@ class PermissionMiddleware
     public function handle($request, Closure $next, $permission)
     {
         if(!$request->user()->hasPermission($permission)) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                abort(403, 'Permission insuffisante.');
+            }
+
             if($request->user()->hasPermission('can_see_home_page')){
                 return redirect(RouteServiceProvider::HOME);
-            }else{
-                abort(403);
             }
-            
+
+            abort(403);
         }
+
         return $next($request);
     }
 }
