@@ -20,35 +20,96 @@ Application web de gestion d'une bibliothèque municipale, développée dans un 
 ## Prérequis
 
 - Docker et Docker Compose
-- Node.js 20+
-- Composer
+
+> Node.js, Composer et PHP sont embarqués dans l'image Docker du projet — aucune installation locale n'est requise.
 
 ## Installation
 
+Toutes les commandes PHP/Node se lancent **à l'intérieur du conteneur `WEB`** via `docker exec -it WEB bash`.
+
+### 1. Cloner le dépôt
+
 ```bash
-# Cloner le dépôt
 git clone <url-du-repo>
-cd bibliotheque-municipale
-
-# Copier le fichier d'environnement
-cp .env.example .env
-
-# Démarrer les conteneurs Docker
-docker-compose up -d
-
-# Installer les dépendances PHP
-composer install
-
-# Générer la clé applicative
-php artisan key:generate
-
-# Exécuter les migrations
-php artisan migrate
-
-# Installer les dépendances JS et compiler les assets
-npm install
-npm run dev
+cd Barres-Bouques
 ```
+
+### 2. Créer le fichier d'environnement
+
+```bash
+cp .env.example .env
+```
+
+### 3. Créer le réseau Docker
+
+Le réseau est déclaré comme externe dans `docker-compose.yml` — il doit exister avant de démarrer les conteneurs.
+
+```bash
+docker network create app-network
+```
+
+> Si le réseau existe déjà, Docker affiche une erreur ignorable.
+
+### 4. Démarrer les conteneurs
+
+```bash
+docker compose up -d
+```
+
+Cela démarre quatre conteneurs : `WEB` (PHP 8.2 + Apache + Node), `DB` (MariaDB), `MONGO` (MongoDB) et `REDIS`.
+
+### 5. Installer les dépendances (dans le conteneur WEB)
+
+```bash
+docker exec -it WEB bash
+
+# Dans le conteneur :
+composer install
+npm install
+exit
+```
+
+### 6. Créer la base de données MySQL
+
+Le conteneur `DB` crée automatiquement la base `laravel`, mais l'application utilise la base `bibliotheque`. Il faut la créer manuellement :
+
+```bash
+docker exec DB mariadb -u root -proot -e "
+  CREATE DATABASE IF NOT EXISTS bibliotheque CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  GRANT ALL PRIVILEGES ON bibliotheque.* TO 'laravel'@'%';
+  FLUSH PRIVILEGES;
+"
+```
+
+### 7. Générer la clé applicative
+
+```bash
+docker exec WEB php artisan key:generate
+```
+
+### 8. Corriger les permissions sur le dossier storage
+
+Apache tourne en tant qu'utilisateur `www-data` dans le conteneur. Le montage du volume depuis l'hôte peut créer des fichiers avec un propriétaire différent.
+
+```bash
+docker exec WEB chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+docker exec WEB chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+```
+
+### 9. Exécuter les migrations et les seeders
+
+```bash
+docker exec WEB php artisan migrate
+docker exec WEB php artisan db:seed
+```
+
+### 10. Lancer le serveur de développement Vite
+
+```bash
+docker exec -it WEB npm run dev
+```
+
+L'application est accessible sur [http://127.0.0.1](http://127.0.0.1).
 
 ## Structure des branches (Git Flow)
 
