@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     image: php8.2-apache-node-composer
-    container_name: WEB_FEDEX_ONBOARDING
+    container_name: WEB
     ports:
       - "80:80"
       - "5173:5173"
@@ -23,7 +23,7 @@ services:
 
   db:
     image: mariadb:latest
-    container_name: DB_FEDEX_ONBOARDING
+    container_name: DB
     ports:
       - "3306:3306"
     environment:
@@ -38,7 +38,7 @@ services:
 
   mongodb:
     image: mongo:6
-    container_name: MONGO_FEDEX_ONBOARDING
+    container_name: MONGO
     ports:
       - "27017:27017"
     environment:
@@ -51,7 +51,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: REDIS_FEDEX_ONBOARDING
+    container_name: REDIS
     ports:
       - "6379:6379"
     volumes:
